@@ -1,0 +1,12 @@
+[package]
+name = "unsafe-lang"
+version = "0.1.0"
+authors = ["Emad Jacob Maroun <emoun.open@gmail.com>"]
+build = "build.rs" # Allows running LALRPOP as a preprocessing step
+
+[build-dependencies]
+lalrpop = "0.13.1"
+
+[dependencies]
+lalrpop-util = "0.13.1"
+regex = "0.2.1"         # For lexing

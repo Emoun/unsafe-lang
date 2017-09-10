@@ -1,0 +1,21 @@
+use super::token_lexer::Token;
+use super::token_lexer::Token::*;
+use super::token_lexer::TokenLexerError;
+
+grammar;
+
+
+pub Program: i32 = {
+	IF ELSE => 1
+};
+
+
+extern {
+	type Location = usize;
+	type Error = TokenLexerError;
+	
+	enum Token {
+		IF => If,
+		ELSE => Else,
+	}
+}
