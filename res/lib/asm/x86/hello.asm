@@ -20,6 +20,7 @@ includelib \masm32\lib\kernel32.lib
 	startingValues	db "Starting",2,"values",58,4
 	finalValues	db "Final",2,"values",58,4
 	startOfDynamicArrayValues db "Values",2,"at",2,"start",2,"of",2,"dynamicArray",58,4
+	lengthString db "Length",58,2
 	SPACE		BYTE 2
 	TAB			BYTE 3
 	NL			BYTE 4
@@ -38,8 +39,56 @@ start:
 	call print_ebp
 	call print_esp
 	
-	mov esi, 0
+	mov esi, 020h
 	call dynamic_array
+	
+	mov ebx, offset lengthString
+	mov ecx, 8
+	call stdout
+	
+	; Print array length
+	mov esi, offset outBuf
+	mov eax, [esp]
+	call uint_to_hex_string
+	
+	mov ebx, offset outBuf
+	mov ecx, 0
+	mov cx, ax
+	call stdout
+	
+	mov ebx, offset NL
+	mov ecx, 1
+	call stdout
+	
+	mov edx, [esp] 		; load the array length
+	mov ecx, 0			; iteration counter
+	mov edi, esp		; The address of the array header
+	
+print_array:
+	cmp ecx, edx
+	jge print_array_end
+	add edi, 4			; move pointer to next element
+	mov eax, [edi]		; load element value
+	mov esi, offset outBuf
+	push ecx
+	push edx
+	push edi
+	call uint_to_hex_string
+	
+	mov ebx, offset outBuf
+	mov ecx, eax
+	call stdout
+	mov ebx, offset NL
+	mov ecx, 1
+	call stdout
+	pop edi
+	pop edx
+	pop ecx
+	add ecx, 1
+	jmp print_array
+	
+	
+print_array_end:
 	
 	mov ebx, offset finalValues
 	mov ecx, 14
@@ -57,11 +106,11 @@ exit:
 ; Output:	[DWORD; ESI]: An array with the number of elements given in EAX
 ; uses:	eax, ebx, ecx, edx, esi, edi
 dynamic_array:
-	mov ebx, offset startOfDynamicArrayValues
-	mov ecx, 33
-	call stdout
-	call print_ebp
-	call print_esp
+	;mov ebx, offset startOfDynamicArrayValues
+	;mov ecx, 33
+	;call stdout
+	;call print_ebp
+	;call print_esp
 	push ebp
 	mov ebp, esp
 	mov ebx, 4		; The size of each element in the array
@@ -104,8 +153,8 @@ dynamic_array_fill_for_end:
 	push eax		; callers ebp
 	add ecx, 8		; we add 8 to the size to be moved so that the ebp and return address are also moved back with the array
 	mov ebx, 0		; i
-	call print_ebp
-	call print_esp
+	;call print_ebp
+	;call print_esp
 	
 dynamic_array_moveback_for:
 	cmp ebx, ecx
@@ -118,11 +167,13 @@ dynamic_array_moveback_for:
 	jmp dynamic_array_moveback_for
 dynamic_array_moveback_for_end:
 	add esp, 8	; the is moved back with the data
-	call print_ebp
-	call print_esp
+	;call print_ebp
+	;call print_esp
 	; in theory we are now done
 	pop ebp
 	ret
+	
+
 	
 	
 end start
